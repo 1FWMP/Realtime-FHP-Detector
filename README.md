@@ -1,11 +1,11 @@
-# 📉 Realtime-FHP-Detector
+# Realtime-FHP-Detector
 
 > **A computer vision-based system for real-time Forward Head Posture (FHP) detection.**
 > This project monitors user posture through a webcam and analyzes the cervical angle to detect FHP (commonly known as "Text Neck").
 
 ---
 
-## 📸 Visualization
+## Visualization
 
 Here is how the system processes the visual data using landmark detection.
 
@@ -16,7 +16,7 @@ Here is how the system processes the visual data using landmark detection.
 
 ---
 
-## ✨ Key Features
+## Key Features
 * **Real-time Tracking**: High-performance detection using Google MediaPipe.
 * **Visual Overlay**: Real-time visualization of skeleton landmarks and connection lines for immediate feedback.
 * **Accuracy-driven**: Optimized to detect subtle shifts in head position (e.g., detecting a 12° forward tilt).
@@ -26,7 +26,7 @@ Here is how the system processes the visual data using landmark detection.
 * **Core Libraries**: `OpenCV`, `MediaPipe`, `NumPy`
 * **Development Environment**: Conda
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Installation
 1. Clone the repository:
