@@ -21,7 +21,7 @@ Here is how the system processes the visual data using landmark detection.
 * **Visual Overlay**: Real-time visualization of skeleton landmarks and connection lines for immediate feedback.
 * **Accuracy-driven**: Optimized to detect subtle shifts in head position (e.g., detecting a 12° forward tilt).
 
-## 🛠 Tech Stack
+## Tech Stack
 * **Language**: Python 3.10
 * **Core Libraries**: `OpenCV`, `MediaPipe`, `NumPy`
 * **Development Environment**: Conda
