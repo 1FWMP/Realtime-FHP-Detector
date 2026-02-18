@@ -21,7 +21,16 @@ class PoseDetector:
       urllib.request.urlretrieve(model_url, model_asset_path)
 
     # Create an PoseLandmarker object
-    base_options = python.BaseOptions(model_asset_path)
+    # Fallback to model_asset_buffer when absolute path contains non-ASCII characters (e.g. Korean)
+    abs_model_path = os.path.abspath(model_asset_path)
+    try:
+      abs_model_path.encode("ascii")
+      base_options = python.BaseOptions(model_asset_path=abs_model_path)
+    except UnicodeEncodeError:
+      with open(abs_model_path, "rb") as f:
+        model_data = f.read()
+      base_options = python.BaseOptions(model_asset_buffer=model_data)
+
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
         output_segmentation_masks=True)
