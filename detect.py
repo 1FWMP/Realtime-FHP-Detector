@@ -10,6 +10,14 @@ from mediapipe.python.solutions import drawing_styles as mp_drawing_styles
 from mediapipe.framework.formats import landmark_pb2
 
 class PoseDetector:
+  TARGET_INDICES = {
+        "nose": 0,
+        "l_eye": 2,
+        "r_eye": 5,
+        "l_shld": 11,
+        "r_shld": 12
+    }
+  
   def __init__(self, image):
     # Convert image format
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -94,23 +102,13 @@ class PoseDetector:
   # Using x, y, z data(Update : .visibility & .presence)
   def key_landmarks_in_image(self):
     if not self.detection_result.pose_landmarks:
-        return None, None, None
+        return {}
     
-    pose_landmarks_list = self.detection_result.pose_landmarks[0]
-    eyes_mid_x = (pose_landmarks_list[2].x + pose_landmarks_list[5].x) / 2
-    eyes_mid_y = (pose_landmarks_list[2].y + pose_landmarks_list[5].y) / 2
-    eyes_mid_z = (pose_landmarks_list[2].z + pose_landmarks_list[5].z) / 2
-
-    head_x = (eyes_mid_x + pose_landmarks_list[0].x) / 2
-    head_y = (eyes_mid_y + pose_landmarks_list[0].y) / 2
-    head_z = (eyes_mid_z + pose_landmarks_list[0].z) / 2
+    landmarks = self.detection_result.pose_landmarks[0]
     
-    head = [head_x, head_y, head_z]
-
-    left_shoulder = [pose_landmarks_list[11].x, pose_landmarks_list[11].y, pose_landmarks_list[11].z]
-    right_shoulder = [pose_landmarks_list[12].x, pose_landmarks_list[12].y, pose_landmarks_list[12].z]
-
-    return head, left_shoulder, right_shoulder
+    # self.TARGET_INDICES를 사용하여 깔끔하게 리턴
+    return {name: [landmarks[idx].x, landmarks[idx].y, landmarks[idx].z] 
+            for name, idx in self.TARGET_INDICES.items()}
 
 if __name__ == "__main__":
     img_path = os.path.join("test", "minji.jpg")

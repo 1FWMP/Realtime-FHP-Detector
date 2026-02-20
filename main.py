@@ -1,7 +1,9 @@
 import cv2
 import detect as dt
+import modules.feature_extractor as pr
 
 DISPLAY = True
+COLLECT = True
 
 def main():
     cap = cv2.VideoCapture(0) # 0 : built-in camera
@@ -12,8 +14,11 @@ def main():
         
         detector = dt.PoseDetector(image)
 
-        # Make key landmarks
-        head, left_shoulder, right_shoulder = detector.key_landmarks_in_image()
+        # Make key landmarks for preprocess of training
+        if COLLECT == True:
+            dots = detector.key_landmarks_in_image()
+            # TODO : preprocess 과정을 통한 데이터 전처리 후 학습모델로 데이터 전달
+            feature_extractor = pr.FeatureExtractor(dots)
 
         # Process the detection result. In this case, visualize it
         if DISPLAY:
