@@ -106,7 +106,6 @@ class PoseDetector:
     
     landmarks = self.detection_result.pose_landmarks[0]
     
-    # self.TARGET_INDICES를 사용하여 깔끔하게 리턴
     return {name: [landmarks[idx].x, landmarks[idx].y, landmarks[idx].z] 
             for name, idx in self.TARGET_INDICES.items()}
 
