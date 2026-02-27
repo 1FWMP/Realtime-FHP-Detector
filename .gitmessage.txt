@@ -1,6 +1,6 @@
 [Type] title (#Issue number)
 # [Header]
-# 형식 - [Type] title (#number of issue)
+# [Type] title (#number of issue)
 #
 # [Type] Input list
 #  1. Feat: Add new function
