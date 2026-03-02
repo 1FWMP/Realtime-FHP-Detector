@@ -18,25 +18,20 @@ class PoseDetector:
         "r_shld": 12
     }
   
-  def __init__(self, MODULE="lite"):
+  def __init__(self, MODULE="heavy"):
     # Model install
-    if MODULE == "heavy":
-      model_asset_path = os.path.join("models", "pose_landmarker.task") # available in windows / linux
-      if not os.path.exists(model_asset_path):
-        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task"
-        urllib.request.urlretrieve(model_url, model_asset_path)
-    
-    elif MODULE == "full":
-      model_asset_path = os.path.join("models", "pose_landmarker_full.task")
-      if not os.path.exists(model_asset_path):
-        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task"
-        urllib.request.urlretrieve(model_url, model_asset_path)
+    if MODULE in ["heavy", "full", "lite"]:
+      model_dir = "models"
+      model_asset_path = os.path.join(model_dir, f"pose_landmarker_{MODULE}.task") # available in windows / linux
 
-    elif MODULE == "lite":
-      model_asset_path = os.path.join("models", "pose_landmarker_lite.task")
+      os.makedirs("models", exist_ok=True)
+
       if not os.path.exists(model_asset_path):
-        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task"
-        urllib.request.urlretrieve(model_url, model_asset_path)
+        try:
+          model_url = f"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_{MODULE}/float16/1/pose_landmarker_{MODULE}.task"
+          urllib.request.urlretrieve(model_url, model_asset_path)
+        except Exception as e:
+          print(f"Error occurs: {e}")
 
     else:
       raise ValueError(f"Not supported module: '{MODULE}'. Choose between 'heavy', 'full', 'lite'")
@@ -95,7 +90,7 @@ class PoseDetector:
     # Extract (0: Nose, 2,5: Eyes(Left-Middle,Right-Middle), 11,12:Shoulder) 5 Dots in 33
     for pose_landmarks in pose_landmarks_list:
       # 1. Select indices
-      target_indices = [0, 2, 5, 11, 12]
+      target_indices = list(self.TARGET_INDICES.values())
       
       # 2. Create Proto object
       pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
