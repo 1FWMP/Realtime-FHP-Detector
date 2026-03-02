@@ -18,14 +18,28 @@ class PoseDetector:
         "r_shld": 12
     }
   
-  def __init__(self, image):
-    # Convert image format for mediapipe
-    self.mp_iamge = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
+  def __init__(self, MODULE="lite"):
     # Model install
-    model_asset_path = os.path.join("models", "pose_landmarker.task") # available in windows / linux
-    if not os.path.exists(model_asset_path):
-      model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task"
-      urllib.request.urlretrieve(model_url, model_asset_path)
+    if MODULE == "heavy":
+      model_asset_path = os.path.join("models", "pose_landmarker.task") # available in windows / linux
+      if not os.path.exists(model_asset_path):
+        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task"
+        urllib.request.urlretrieve(model_url, model_asset_path)
+    
+    elif MODULE == "full":
+      model_asset_path = os.path.join("models", "pose_landmarker_full.task")
+      if not os.path.exists(model_asset_path):
+        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task"
+        urllib.request.urlretrieve(model_url, model_asset_path)
+
+    elif MODULE == "lite":
+      model_asset_path = os.path.join("models", "pose_landmarker_lite.task")
+      if not os.path.exists(model_asset_path):
+        model_url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task"
+        urllib.request.urlretrieve(model_url, model_asset_path)
+
+    else:
+      raise ValueError(f"Not supported module: '{MODULE}'. Choose between 'heavy', 'full', 'lite'")
 
     # Create an PoseLandmarker object
     # Fallback to model_asset_buffer when absolute path contains non-ASCII characters (e.g. Korean)
@@ -40,15 +54,19 @@ class PoseDetector:
 
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
-        output_segmentation_masks=True)
+        output_segmentation_masks=False) # Ability to create silhouette (cutout for background separation) images
 
     # Detect pose landmarks from the input image
-    detector = vision.PoseLandmarker.create_from_options(options)
-    self.detection_result = detector.detect(self.mp_iamge)
+    self.detector = vision.PoseLandmarker.create_from_options(options)
 
+  def __call__(self, image):
+    # Convert image format for mediapipe
+    self.mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
+    self.detection_result = self.detector.detect(self.mp_image)
+    
   # Built-in function - draw landmarks
   def draw_landmarks_on_image(self):
-    np_image = self.mp_iamge.numpy_view()
+    np_image = self.mp_image.numpy_view()
     pose_landmarks_list = self.detection_result.pose_landmarks
     annotated_image = np.copy(np_image)
 
@@ -101,7 +119,7 @@ class PoseDetector:
   # Using x, y, z data(Update : .visibility & .presence)
   def key_landmarks_in_image(self):
     if not self.detection_result.pose_landmarks:
-        return {}
+        return None
     
     landmarks = self.detection_result.pose_landmarks[0]
     
@@ -112,7 +130,9 @@ if __name__ == "__main__":
     img_path = os.path.join("test", "minji.jpg")
     img = cv2.imread(img_path)
     cv2.imshow("IMG", img)
-    detector = PoseDetector(img)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    detector = PoseDetector()
+    detector(img_rgb)
     annotated_image = detector.draw_landmarks_on_image()
     cv2.imshow("Display",cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
     cv2.waitKey(0)
